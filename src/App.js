@@ -1,6 +1,7 @@
 import { Grid, IconButton, Paper, TextField, Card, Typography, Box } from "@material-ui/core";
 //import SearchIcon from "@mui/icons-material";
 import { useEffect, useState } from "react";
+import moment from "moment"
 
 function App() {
   const [currentWeatecCondition, setCurrentWeatecCondition] = useState();
@@ -24,13 +25,12 @@ function App() {
   }
 
   function trasnformData(data) {
-    let space = data.split('-');
-    return space[space.length - 1] + "/" + space[1] + "/" + space[0]
+    return moment(data).format('DD MMMM YYYY')
   }
 
   function fillfutureWeather() {
     fetch(
-      `http://api.weatherapi.com/v1/forecast.json?key=31277a23a4924344afc173640222912&q=${autoComplete}&lang=&days=7`
+      `http://api.weatherapi.com/v1/forecast.json?key=31277a23a4924344afc173640222912&q=${autoComplete}&lang=pt&days=7`
     ).then((response) => {
       if (response.status === 200) {
         return response.json();
@@ -52,8 +52,9 @@ function App() {
   // })
   // }
 
+
   return (
-    <Grid container direction="column" style={{ backgroundColor: cor }}>
+    <Grid container direction="column" style={{ backgroundImage: " url('https://usagif.com/wp-content/uploads/gifs/starfall-gif-5.gif')" }}>
 
       <Grid container>
         <Paper>
@@ -75,36 +76,36 @@ function App() {
         </Paper>
       </Grid>
 
-      <Grid container>
-        {currentWeatecCondition ?
-          <Grid item style={{ width: "100vw" }}>
-            <Card style={{ height: "50vh" }}>
+      {currentWeatecCondition ?
+        <Grid container>
+          <Grid item style={{ width: "70vw" }}>
+            <Grid style={{ height: "50vh", background: "none" }}>
               <Typography>{currentWeatecCondition.location.name}</Typography>
               <Typography style={{ fontSize: 60, color: cor }}>{currentWeatecCondition.current.temp_c}º</Typography>
-              <Typography>{currentWeatecCondition.current.condition.text}</Typography>
-              <Typography>Min: {forecastCondition.forecast.forecastday[0].day.mintemp_c}º Máx: {forecastCondition.forecast.forecastday[0].day.maxtemp_c}º</Typography>
-              <Typography style={{ fontSize: 12 }}>Sol nasce: {forecastCondition.forecast.forecastday[0].astro.sunrise} </Typography>
-              <Typography style={{ fontSize: 12 }}>Sol se pôe: {forecastCondition.forecast.forecastday[0].astro.sunset}</Typography>
+              <Typography style={{ color: "#ffffff" }}>{currentWeatecCondition.current.condition.text}</Typography>
+              <Typography style={{ color: "#ffffff" }}>Min: {forecastCondition.forecast.forecastday[0].day.mintemp_c}º Máx: {forecastCondition.forecast.forecastday[0].day.maxtemp_c}º</Typography>
+              <Typography style={{ fontSize: 12, color: "#ffffff" }}>Sol nasce: {forecastCondition.forecast.forecastday[0].astro.sunrise} </Typography>
+              <Typography style={{ fontSize: 12, color: "#ffffff" }}>Sol se pôe: {forecastCondition.forecast.forecastday[0].astro.sunset}</Typography>
               <img src={currentWeatecCondition.current.condition.icon} />
-            </Card>
+            </Grid>
           </Grid>
-          : <></>
-        }
-        <Grid container direction="row" style={{ width: "100vw", justifyContent: "space-around" }}>
-          {forecastCondition.forecast.forecastday.map((forecastday, index) => {
-            if (index == 0) return;
-            return (
-              <Card style={{ alingContent: "center" }}>
-                <Typography style={{ fontSize: 60, color: cor }}>{forecastday.day.avgtemp_c}º</Typography>
-                <Typography>{forecastday.day.condition.text}</Typography>
-                <Typography>Min: {forecastday.day.mintemp_c}º Máx: {forecastday.day.maxtemp_c}º</Typography>
-                <Typography>Data: {trasnformData(forecastday.date)}</Typography>
-                <img src={forecastday.day.condition.icon} />
-              </Card>
-            )
-          })}
+
+          <Grid container direction="row" style={{ width: "100vw", justifyContent: "space-around" }}>
+            {forecastCondition.forecast.forecastday.map((forecastday, index) => {
+              if (index == 0) return;
+              return (
+                <Card style={{ alingContent: "center", background: "none" }} variant="elevation">
+                  <Typography style={{ color: "#ffffff" }}>Data: {trasnformData(forecastday.date)}</Typography>
+                  <Typography style={{ fontSize: 20, color: cor }}>{forecastday.day.avgtemp_c}º</Typography>
+                  <img src={forecastday.day.condition.icon} />
+                  <Typography style={{ color: "#ffffff" }} >{forecastday.day.condition.text}</Typography>
+                  <Typography style={{ color: "#ffffff" }} >Min: {forecastday.day.mintemp_c}º Máx: {forecastday.day.maxtemp_c}º</Typography>
+                </Card>
+              )
+            })}
+          </Grid>
         </Grid>
-      </Grid>
+        : <></>}
 
       <Grid container>
         asdas
