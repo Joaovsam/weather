@@ -6,26 +6,30 @@ import moment from "moment"
 function App() {
   const [search, setSearch] = useState();
   const [forecastCondition, setForecastCondition] = useState();
-  const [autoComplete, setAutoComplete] = useState("Timoteo");
+  const [autoComplete, setAutoComplete] = useState("timoteo");
 
   let cor = "#00FFFF"
 
-  //31277a23a4924344afc173640222912 key for search
-
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(location => {
-      setAutoComplete(location.coords.latitude + "," + location.coords.longitude);
-    });
+    getLocation();
     fillforecastWeather();
-  }, [])
+  }, [search])
+
+  function getLocation() {
+    if (search) return
+    navigator.geolocation.getCurrentPosition(location => {
+      setSearch(location.coords.latitude + "," + location.coords.longitude);
+    })
+  }
 
   function trasnformData(data) {
     return moment(data).format('DD MMMM YYYY')
   }
 
   function fillforecastWeather() {
+    if (!search) return;
     fetch(
-      `http://api.weatherapi.com/v1/forecast.json?key=31277a23a4924344afc173640222912&q=${autoComplete}&lang=pt&days=7`
+      `http://api.weatherapi.com/v1/forecast.json?key=31277a23a4924344afc173640222912&q=${search}&lang=pt&days=7`
     ).then((response) => {
       if (response.status === 200) {
         return response.json();
@@ -92,7 +96,7 @@ function App() {
             {forecastCondition.forecast.forecastday.map((forecastday, index) => {
               if (index == 0) return;
               return (
-                <Card style={{ textAlign: "center", alingContent: "center", background: "rgba(0, 0, 0, 0.4)" }} variant="elevation">
+                <Card key={index} style={{ textAlign: "center", alingContent: "center", background: "rgba(0, 0, 0, 0.4)" }} variant="elevation">
                   <Typography style={{ color: "#ffffff" }}>Data: {trasnformData(forecastday.date)}</Typography>
                   <Typography style={{ fontSize: 20, color: cor }}>{forecastday.day.avgtemp_c}º</Typography>
                   <img src={forecastday.day.condition.icon} />
