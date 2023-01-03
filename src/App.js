@@ -6,7 +6,7 @@ import moment from "moment"
 function App() {
   const [search, setSearch] = useState();
   const [forecastCondition, setForecastCondition] = useState();
-  const [autoComplete, setAutoComplete] = useState("timoteo");
+  const [autoComplete, setAutoComplete] = useState("");
 
   let cor = "#00FFFF"
 
@@ -35,12 +35,12 @@ function App() {
         return response.json();
       }
     }).then((data) => {
-      console.log(data)
       setForecastCondition(data);
     })
   }
 
   function fillAutoComplete() {
+    if (!autoComplete) return;
     fetch(
       `http://api.weatherapi.com/v1/search.json?key=31277a23a4924344afc173640222912&&q=${autoComplete}&lang=pt`
     ).then((response) => {
@@ -56,8 +56,8 @@ function App() {
   return (
     <Grid container direction="column" style={{ backgroundImage: " url('https://usagif.com/wp-content/uploads/gifs/starfall-gif-5.gif')" }}>
 
-      <Grid container>
-        <Paper>
+      <Grid container style={{ background: "none", }}>
+        <Paper style={{ background: "none", }}>
           <TextField
             id="standard-basic"
             label="Cidade"
@@ -71,7 +71,7 @@ function App() {
             }
           />
           <IconButton aria-label="searchCity" onClick={() => {
-            fillforecastWeather();
+            setSearch(autoComplete);
           }}>
             <SearchIcon />
           </IconButton>
