@@ -4,43 +4,26 @@ import { useEffect, useState } from "react";
 import moment from "moment"
 
 function App() {
-  const [currentWeatecCondition, setCurrentWeatecCondition] = useState();
+  const [search, setSearch] = useState();
   const [forecastCondition, setForecastCondition] = useState();
   const [autoComplete, setAutoComplete] = useState("Timoteo");
 
   let cor = "#00FFFF"
 
-  //31277a23a4924344afc173640222912
+  //31277a23a4924344afc173640222912 key for search
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(location => {
-      console.log(location);
       setAutoComplete(location.coords.latitude + "," + location.coords.longitude);
     });
-    fillCurrentWeather();
-    fillfutureWeather();
+    fillforecastWeather();
   }, [])
-
-
-
-  function fillCurrentWeather() {
-    fetch(
-      `http://api.weatherapi.com/v1/current.json?key=31277a23a4924344afc173640222912&q=${autoComplete}&lang=pt`
-    ).then((response) => {
-      if (response.status === 200) {
-        return response.json();
-      }
-    }).then((data) => {
-      console.log(data)
-      setCurrentWeatecCondition(data);
-    })
-  }
 
   function trasnformData(data) {
     return moment(data).format('DD MMMM YYYY')
   }
 
-  function fillfutureWeather() {
+  function fillforecastWeather() {
     fetch(
       `http://api.weatherapi.com/v1/forecast.json?key=31277a23a4924344afc173640222912&q=${autoComplete}&lang=pt&days=7`
     ).then((response) => {
@@ -52,6 +35,7 @@ function App() {
       setForecastCondition(data);
     })
   }
+
   function fillAutoComplete() {
     fetch(
       `http://api.weatherapi.com/v1/search.json?key=31277a23a4924344afc173640222912&&q=${autoComplete}&lang=pt`
@@ -83,25 +67,24 @@ function App() {
             }
           />
           <IconButton aria-label="searchCity" onClick={() => {
-            fillCurrentWeather();
-            fillfutureWeather();
+            fillforecastWeather();
           }}>
             <SearchIcon />
           </IconButton>
         </Paper>
       </Grid>
 
-      {currentWeatecCondition && forecastCondition ?
+      {forecastCondition ?
         <Grid container>
           <Grid item >
             <Grid style={{ height: "50vh", background: "none", }}>
-              <Typography style={{ color: "#ffffff" }}>{currentWeatecCondition.location.name}</Typography>
-              <Typography style={{ fontSize: 60, color: cor }}>{currentWeatecCondition.current.temp_c}º</Typography>
-              <Typography style={{ color: "#ffffff" }}>{currentWeatecCondition.current.condition.text}</Typography>
+              <Typography style={{ color: "#ffffff" }}>{forecastCondition.location.name}</Typography>
+              <Typography style={{ fontSize: 60, color: cor }}>{forecastCondition.current.temp_c}º</Typography>
+              <Typography style={{ color: "#ffffff" }}>{forecastCondition.current.condition.text}</Typography>
               <Typography style={{ color: "#ffffff" }}>Min: {forecastCondition.forecast.forecastday[0].day.mintemp_c}º Máx: {forecastCondition.forecast.forecastday[0].day.maxtemp_c}º</Typography>
               <Typography style={{ fontSize: 12, color: "#ffffff" }}>Sol nasce: {forecastCondition.forecast.forecastday[0].astro.sunrise} </Typography>
               <Typography style={{ fontSize: 12, color: "#ffffff" }}>Sol se pôe: {forecastCondition.forecast.forecastday[0].astro.sunset}</Typography>
-              <img src={currentWeatecCondition.current.condition.icon} />
+              <img src={forecastCondition.current.condition.icon} />
             </Grid>
           </Grid>
 
