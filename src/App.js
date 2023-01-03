@@ -1,5 +1,5 @@
 import { Grid, IconButton, Paper, TextField, Card, Typography, Box } from "@material-ui/core";
-//import SearchIcon from "@mui/icons-material";
+import SearchIcon from "@material-ui/icons/Search";
 import { useEffect, useState } from "react";
 import moment from "moment"
 
@@ -11,6 +11,18 @@ function App() {
   let cor = "#00FFFF"
 
   //31277a23a4924344afc173640222912
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(location => {
+      console.log(location);
+      setAutoComplete(location.coords.latitude + "," + location.coords.longitude);
+    });
+    fillCurrentWeather();
+    fillfutureWeather();
+  }, [])
+
+
+
   function fillCurrentWeather() {
     fetch(
       `http://api.weatherapi.com/v1/current.json?key=31277a23a4924344afc173640222912&q=${autoComplete}&lang=pt`
@@ -40,17 +52,17 @@ function App() {
       setForecastCondition(data);
     })
   }
-  // function fillAutoComplete() {
-  // fetch(
-  // `http://api.weatherapi.com/v1/search.json?key=31277a23a4924344afc173640222912&&q=${autoComplete}&lang=pt`
-  // ).then((response) => {
-  // if (response.status === 200) {
-  // return response.json();
-  // }
-  // }).then((data) => {
-  // console.log(data)
-  // })
-  // }
+  function fillAutoComplete() {
+    fetch(
+      `http://api.weatherapi.com/v1/search.json?key=31277a23a4924344afc173640222912&&q=${autoComplete}&lang=pt`
+    ).then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+    }).then((data) => {
+      console.log(data)
+    })
+  }
 
 
   return (
@@ -64,23 +76,26 @@ function App() {
             variant="outlined"
             value={autoComplete}
             onChange={
-              (e) => setAutoComplete(e.target.value)
+              (e) => {
+                fillAutoComplete();
+                setAutoComplete(e.target.value);
+              }
             }
           />
           <IconButton aria-label="searchCity" onClick={() => {
             fillCurrentWeather();
             fillfutureWeather();
           }}>
-            Pesquisa
+            <SearchIcon />
           </IconButton>
         </Paper>
       </Grid>
 
-      {currentWeatecCondition ?
+      {currentWeatecCondition && forecastCondition ?
         <Grid container>
-          <Grid item style={{ width: "70vw" }}>
-            <Grid style={{ height: "50vh", background: "none" }}>
-              <Typography>{currentWeatecCondition.location.name}</Typography>
+          <Grid item >
+            <Grid style={{ height: "50vh", background: "none", }}>
+              <Typography style={{ color: "#ffffff" }}>{currentWeatecCondition.location.name}</Typography>
               <Typography style={{ fontSize: 60, color: cor }}>{currentWeatecCondition.current.temp_c}º</Typography>
               <Typography style={{ color: "#ffffff" }}>{currentWeatecCondition.current.condition.text}</Typography>
               <Typography style={{ color: "#ffffff" }}>Min: {forecastCondition.forecast.forecastday[0].day.mintemp_c}º Máx: {forecastCondition.forecast.forecastday[0].day.maxtemp_c}º</Typography>
@@ -94,7 +109,7 @@ function App() {
             {forecastCondition.forecast.forecastday.map((forecastday, index) => {
               if (index == 0) return;
               return (
-                <Card style={{ alingContent: "center", background: "none" }} variant="elevation">
+                <Card style={{ textAlign: "center", alingContent: "center", background: "rgba(0, 0, 0, 0.4)" }} variant="elevation">
                   <Typography style={{ color: "#ffffff" }}>Data: {trasnformData(forecastday.date)}</Typography>
                   <Typography style={{ fontSize: 20, color: cor }}>{forecastday.day.avgtemp_c}º</Typography>
                   <img src={forecastday.day.condition.icon} />
